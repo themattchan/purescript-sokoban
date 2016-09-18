@@ -3,13 +3,11 @@ module Main where
 import Prelude
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
-
-import Data.Array as A
-
+import
 data Board = Board
   { width  :: Int
   , height :: Int
-  , board  :: A.Array (A.Array Space)
+  , board  :: Array (Array Space)
   }
 
 data Space
