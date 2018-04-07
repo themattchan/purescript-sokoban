@@ -1,7 +1,6 @@
 module Types where
 
---import Prelude
-
+import Prelude
 
 type Board =
   { width  :: Int
@@ -28,11 +27,15 @@ data Cell
   | GoalEmpty
   | Goal Boolean
   | Empty
---  deriving (Show, Eq)
+
+derive instance showCell :: Show Cell
+derive instance eqCell :: Eq Cell
 
 data Move
   = Up
   | Down
   | Left
   | Right
---  deriving (Show, Eq)
+
+derive instance showMove :: Show Move
+derive instance eqMove :: Eq Move

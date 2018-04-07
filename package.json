@@ -1,0 +1,12 @@
+{
+  "name": "purescript-sokoban",
+  "version": "0.1.0",
+  "description": "A simple sokoban game",
+  "scripts": {
+    "build": "pulp build",
+    "package": "pulp build --to sokoban.js"
+  },
+  "dependencies": {
+    "yarn": "^1.5.1"
+  }
+}

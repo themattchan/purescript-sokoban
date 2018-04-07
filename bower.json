@@ -9,17 +9,11 @@
   "dependencies": {
     "purescript-console": "^3.0.0",
     "purescript-arrays": "^4.0.1",
-    "purescript-pux": "^9.1.0",
-    "purescript-parsing": "^4.2.1",
     "purescript-lists": "^4.1.1",
-    "purescript-aff": "latest"
+    "purescript-thermite": "^5.0.0",
+    "purescript-record-show": "^0.4.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
-  },
-  "resolutions": {
-    "purescript-console": "^3.0.0",
-    "purescript-eff": "^3.1.0",
-    "purescript-prelude": "^3.0.0"
   }
 }
