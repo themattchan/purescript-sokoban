@@ -17,6 +17,9 @@ type Coord =
   , y :: Int
   }
 
+coord :: Int -> Int -> Coord
+coord x y = {x,y}
+
 newtype Player = Player Coord
 derive instance newtypePlayer :: Newtype Player _
 instance showplayer :: Show Player where show = showRecord <<< unwrap

@@ -67,18 +67,18 @@ parseBoard = -- (flip trace <*> (show <<< map showRecord)) <<<
                   traverseWithIndex
                     (\i ->
                       map (padR width) <<<
-                      traverseWithIndex (\j -> Compose <<< convert {x:j, y:i}) <<<
+                      traverseWithIndex (\j -> Compose <<< charToCell (coord j i)) <<<
                       S.toCharArray
                     )
 
 type MovablePieces = Tuple (First Player) (Maybe Boxes)
 
-convert :: Coord -> Char -> Maybe (Tuple MovablePieces Cell)
-convert c '#' = Just $ Tuple mempty Wall
-convert c '@' = Just $ Tuple (Tuple (pure (Player c)) mempty) Empty -- emit player
-convert c '+' = Just $ Tuple (Tuple (pure (Player c)) mempty) Goal -- emit player
-convert c '$' = Just $ Tuple (Tuple mempty (pure (NE.singleton (Box c)))) Empty -- emit box
-convert c '*' = Just $ Tuple (Tuple mempty (pure (NE.singleton (Box c)))) Goal -- emit box
-convert c '.' = Just $ Tuple mempty Goal
-convert c ' ' = Just $ Tuple mempty Empty
-convert _ _   = Nothing
+charToCell :: Coord -> Char -> Maybe (Tuple MovablePieces Cell)
+charToCell c '#' = Just $ Tuple mempty Wall
+charToCell c '@' = Just $ Tuple (Tuple (pure (Player c)) mempty) Empty -- emit player
+charToCell c '+' = Just $ Tuple (Tuple (pure (Player c)) mempty) Goal -- emit player
+charToCell c '$' = Just $ Tuple (Tuple mempty (pure (NE.singleton (Box c)))) Empty -- emit box
+charToCell c '*' = Just $ Tuple (Tuple mempty (pure (NE.singleton (Box c)))) Goal -- emit box
+charToCell c '.' = Just $ Tuple mempty Goal
+charToCell c ' ' = Just $ Tuple mempty Empty
+charToCell _ _   = Nothing
