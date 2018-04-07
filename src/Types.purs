@@ -1,11 +1,15 @@
 module Types where
 
 import Prelude
+import Matrix (Matrix)
+import Data.Newtype
+import Data.List.NonEmpty
+
 
 type Board = Matrix Cell -- could just store this with a range tree
 
 -- top left is (y:0,x:0), move one to right is (y:0,x:1), one down is (y:1,x:0)
-type Coord
+type Coord =
   { x :: Int
   , y :: Int
   }
@@ -14,7 +18,7 @@ newtype Player = Player Coord
 derive instance newtypePlayer :: Newtype Player _
 
 -- | A box is represented by a coord
-newtype Box = Player Coord
+newtype Box = Box Coord
 derive instance newtypeBox :: Newtype Box _
 
 type Boxes = NonEmptyList Coord
@@ -36,8 +40,13 @@ data Cell
   | Goal
   | CompletedGoal
   | Empty
+instance showCell :: Show Cell where
+  show Wall = "#"
+  show Goal = "."
+  show CompletedGoal = "*"
+  show Empty = " "
 
-derive instance showCell :: Show Cell
+--derive instance showCell :: Show Cell
 derive instance eqCell :: Eq Cell
 
 data Direction
@@ -46,7 +55,12 @@ data Direction
   | Left
   | Right
 
-derive instance showDirection :: Show Direction
+instance showDirection :: Show Direction where
+  show Up = "Up"
+  show Down = "Down"
+  show Left = "Left"
+  show Right = "Right"
+--derive instance showDirection :: Show Direction
 derive instance eqDirection :: Eq Direction
 
 newtype Orientation = Orientation Direction

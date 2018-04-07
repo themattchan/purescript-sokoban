@@ -8,7 +8,7 @@ import DOM.HTML (window) as DOM
 import DOM.HTML.Types (htmlDocumentToParentNode) as DOM
 import DOM.HTML.Window (document) as DOM
 import DOM.Node.ParentNode (querySelector, QuerySelector(..)) as DOM
-import Data.Maybe (Maybe, fromJust)
+import Data.Maybe
 import Partial.Unsafe (unsafePartial)
 import React (ReactComponent)
 import React (createFactory) as R
@@ -20,5 +20,5 @@ import Thermite as T
 import Types
 
 main :: forall e. Eff (dom :: DOM | e) (Maybe ReactComponent)
-main = do
-  log "Hello sailor!"
+main = do pure Nothing
+--  log "Hello sailor!"

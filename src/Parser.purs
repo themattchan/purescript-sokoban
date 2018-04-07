@@ -1,14 +1,23 @@
 module Parser where
 
+import Types
+
 import Prelude
+import Control.Alternative ((<|>))
 import Data.Array as A
 import Data.String as S
-import Data.Ord.Max (Max(..)
-import Data.Matrix as Matrix
+import Data.Ord.Max (Max(..))
+import Matrix as Matrix
+import Data.Foldable
+import Data.Traversable
 import Data.TraversableWithIndex
 import Data.Functor.Compose
 import Data.Tuple
-import Types
+import Data.Newtype
+import Data.Maybe
+import Data.Monoid
+import Data.Semigroup
+import Data.List.NonEmpty as NE
 
 -- Wall                     #   0x23
 -- Player                   @   0x40
@@ -18,13 +27,13 @@ import Types
 -- Goal square              .   0x2e
 -- Floor                (Space) 0x20
 
-parseBoards :: String -> List State
-parseBoards = mapMaybe parseBoard <<< S.split (Pattern "\n\n")
+parseBoards :: String -> Array Level
+parseBoards = A.mapMaybe parseBoard <<< S.split (S.Pattern "\n\n")
 
-parseBoard :: String -> Maybe State
+parseBoard :: String -> Maybe Level
 parseBoard = makeBoard
            <<< A.span (any ((_ == ';') <<< _.head) <<< S.uncons)
-           <<< S.split (Pattern "\n")
+           <<< S.split (S.Pattern "\n")
   where
     makeBoard {init, rest} = do
         Tuple (MP {player:maybePlayer, boxes: maybeBoxes}) board
@@ -36,6 +45,7 @@ parseBoard = makeBoard
         levelName = S.drop 2 <$> A.head rest
         padR n xs = xs <> A.replicate (n - A.length xs) Empty
         width = unwrap $ foldMap (Max <<< A.length) init
+        -- TODO use Data.Distributive.collect here
         doCells = map Matrix.fromArray <<<
                   traverseWithIndex
                     (\i ->
@@ -50,15 +60,16 @@ derive instance newtypeMovablePieces :: Newtype MovablePieces _
 
 instance monoidMovablePieces :: Monoid MovablePieces where
   mempty = MP {player:Nothing, boxes:Nothing}
-  mappend (MP {player:p1, boxes:b1}) (MP {player:p2, boxes:b2})
+instance semigroupMovablePieces :: Semigroup MovablePieces where
+  append (MP {player:p1, boxes:b1}) (MP {player:p2, boxes:b2})
     = MP {player:p1<|>p2, boxes:b1<>b2}
 
 convert :: Coord -> Char -> Compose Maybe (Tuple MovablePieces) Cell
 convert c '#' = Compose $ Just $ Tuple mempty Wall
-convert c '@' = Compose $ Just $ Tuple (mempty{player=Just c}) Empty -- emit player
-convert c '+' = Compose $ Just $ Tuple (mempty{player=Just c}) Goal -- emit player
-convert c '$' = Compose $ Just $ Tuple (mempty{boxes=Just (pure c)}) Empty -- emit box
-convert c '*' = Compose $ Just $ Tuple (mempty{player=Just (pure c)}) Goal -- emit box
+convert c '@' = Compose $ Just $ Tuple ((\(MP x) -> MP $ x{player=Just $ Player c}) mempty) Empty -- emit player
+convert c '+' = Compose $ Just $ Tuple ((\(MP x) -> MP $ x{player=Just $ Player c}) mempty) Goal -- emit player
+convert c '$' = Compose $ Just $ Tuple ((\(MP x) -> MP $ x{boxes=Just $ NE.singleton $ Box c}) mempty) Empty -- emit box
+convert c '*' = Compose $ Just $ Tuple ((\(MP x) -> MP $ x{boxes=Just $ NE.singleton $ Box c}) mempty) Goal -- emit box
 convert c '.' = Compose $ Just $ Tuple mempty Goal
 convert c ' ' = Compose $ Just $ Tuple mempty Empty
 convert _ _   = Compose Nothing
