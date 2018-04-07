@@ -2,6 +2,7 @@ module Types where
 
 import Prelude
 import Matrix (Matrix)
+import Data.Maybe (Maybe)
 import Data.Newtype
 import Data.List.NonEmpty
 
@@ -21,13 +22,13 @@ derive instance newtypePlayer :: Newtype Player _
 newtype Box = Box Coord
 derive instance newtypeBox :: Newtype Box _
 
-type Boxes = NonEmptyList Coord
+type Boxes = NonEmptyList Box
 
 type Level =
   { board :: Board
   , player :: Player
   , boxes :: Boxes
-  , levelName :: String
+  , levelName :: Maybe String
   }
 
 type NamedBoard =

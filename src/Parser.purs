@@ -7,13 +7,15 @@ import Control.Alternative ((<|>))
 import Data.Array as A
 import Data.String as S
 import Data.Ord.Max (Max(..))
+import Matrix (Matrix)
 import Matrix as Matrix
 import Data.Foldable
 import Data.Traversable
 import Data.TraversableWithIndex
 import Data.Functor.Compose
+import Data.Profunctor
 import Data.Tuple
-import Data.Newtype
+import Data.Newtype (class Newtype, unwrap)
 import Data.Maybe
 import Data.Monoid
 import Data.Semigroup
@@ -35,18 +37,20 @@ parseBoard = makeBoard
            <<< A.span (any ((_ == ';') <<< _.head) <<< S.uncons)
            <<< S.split (S.Pattern "\n")
   where
+    makeBoard :: {init :: Array String, rest :: Array String } -> Maybe Level
     makeBoard {init, rest} = do
         Tuple (MP {player:maybePlayer, boxes: maybeBoxes}) board
-           <- unwrap (doCells init)
+           <- doCells init
         player <- maybePlayer
         boxes <- maybeBoxes
         pure $ {levelName, player, boxes, board}
       where
         levelName = S.drop 2 <$> A.head rest
         padR n xs = xs <> A.replicate (n - A.length xs) Empty
-        width = unwrap $ foldMap (Max <<< A.length) init
+        width = unwrap $ foldMap (Max <<< S.length) init
         -- TODO use Data.Distributive.collect here
-        doCells = map Matrix.fromArray <<<
+        doCells :: Array String -> Maybe (Tuple MovablePieces (Matrix Cell))
+        doCells = traverse Matrix.fromArray <=< unwrap <<<
                   traverseWithIndex
                     (\i ->
                       map (padR width) <<<
