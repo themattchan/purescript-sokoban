@@ -2,40 +2,55 @@ module Types where
 
 import Prelude
 
-type Board =
-  { width  :: Int
-  , height :: Int
-  , board  :: Array (Array Cell)
-  }
+type Board = Matrix Cell -- could just store this with a range tree
 
-type Player =
+-- top left is (y:0,x:0), move one to right is (y:0,x:1), one down is (y:1,x:0)
+type Coord
   { x :: Int
   , y :: Int
   }
 
-type State =
+newtype Player = Player Coord
+derive instance newtypePlayer :: Newtype Player _
+
+-- | A box is represented by a coord
+newtype Box = Player Coord
+derive instance newtypeBox :: Newtype Box _
+
+type Boxes = NonEmptyList Coord
+
+type Level =
   { board :: Board
   , player :: Player
+  , boxes :: Boxes
+  , levelName :: String
+  }
+
+type NamedBoard =
+  { board :: Board
+  , levelName :: String
   }
 
 data Cell
   = Wall
-  | Box
-  | Player
-  | GoalBox
-  | GoalPlayer
-  | GoalEmpty
-  | Goal Boolean
+  | Goal
+  | CompletedGoal
   | Empty
 
 derive instance showCell :: Show Cell
 derive instance eqCell :: Eq Cell
 
-data Move
+data Direction
   = Up
   | Down
   | Left
   | Right
 
-derive instance showMove :: Show Move
-derive instance eqMove :: Eq Move
+derive instance showDirection :: Show Direction
+derive instance eqDirection :: Eq Direction
+
+newtype Orientation = Orientation Direction
+derive instance newtypeOrientation :: Newtype Orientation _
+
+newtype Move = Move Direction
+derive instance newtypeMove :: Newtype Move _

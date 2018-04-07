@@ -11,7 +11,10 @@
     "purescript-arrays": "^4.0.1",
     "purescript-lists": "^4.1.1",
     "purescript-thermite": "^5.0.0",
-    "purescript-record-show": "^0.4.0"
+    "purescript-record-show": "^0.4.0",
+    "purescript-matrices": "^3.0.0",
+    "purescript-newtype": "^2.0.0",
+    "purescript-functors": "^2.2.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
