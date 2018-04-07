@@ -44,10 +44,9 @@ parseBoards :: String -> Array Level
 parseBoards = A.mapMaybe parseBoard <<< S.split (S.Pattern "\n\n")
 
 parseBoard :: String -> Maybe Level
-parseBoard = (flip trace <*> (show <<< map showRecord))
-           <<< makeBoard
-           <<< A.span (any ((_ == ';') <<< _.head) <<< S.uncons)
---           <<< traceShow
+parseBoard = -- (flip trace <*> (show <<< map showRecord)) <<<
+             makeBoard
+           <<< A.span (any ((_ /= ';') <<< _.head) <<< S.uncons)
            <<< S.split (S.Pattern "\n")
   where
     makeBoard :: {init :: Array String, rest :: Array String } -> Maybe Level
