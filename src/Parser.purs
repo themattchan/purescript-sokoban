@@ -20,6 +20,11 @@ import Data.Maybe
 import Data.Monoid
 import Data.Semigroup
 import Data.List.NonEmpty as NE
+import Control.Monad.Eff.Console (log)
+import Control.Monad.Eff.Unsafe
+
+import Data.Record.ShowRecord
+
 
 -- Wall                     #   0x23
 -- Player                   @   0x40
@@ -29,12 +34,20 @@ import Data.List.NonEmpty as NE
 -- Goal square              .   0x2e
 -- Floor                (Space) 0x20
 
+trace :: forall a. String -> a -> a
+trace m a = unsafePerformEff (log m >>= \_ -> pure a)
+
+traceShow :: forall a. Show a => a -> a
+traceShow a = trace (show a) a
+
 parseBoards :: String -> Array Level
 parseBoards = A.mapMaybe parseBoard <<< S.split (S.Pattern "\n\n")
 
 parseBoard :: String -> Maybe Level
-parseBoard = makeBoard
+parseBoard = (flip trace <*> (show <<< map showRecord))
+           <<< makeBoard
            <<< A.span (any ((_ == ';') <<< _.head) <<< S.uncons)
+--           <<< traceShow
            <<< S.split (S.Pattern "\n")
   where
     makeBoard :: {init :: Array String, rest :: Array String } -> Maybe Level

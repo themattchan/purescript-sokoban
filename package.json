@@ -7,6 +7,9 @@
     "package": "pulp build --to sokoban.js"
   },
   "dependencies": {
+    "create-react-class": "^15.6.3",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1",
     "yarn": "^1.5.1"
   }
 }

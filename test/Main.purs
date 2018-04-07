@@ -7,6 +7,8 @@ import Control.Monad.Eff.Console (CONSOLE, log, logShow)
 import Node.FS.Sync
 import Node.Encoding
 import Node.FS
+import Pathy
+import Data.Foldable
 import Everything
 
 main :: forall e. Eff ( console :: CONSOLE
@@ -16,5 +18,7 @@ main :: forall e. Eff ( console :: CONSOLE
                       ) Unit
 main = do
   input <- readTextFile UTF8 "data/100Boxes.txt"
-  log $ show $ map showRecord $ parseBoards input
+  let f  = parseBoards input:: Array Level
+  log $ show $ map showRecord $ f
+  log $ show (length f :: Int)
 --  log "You should add some tests."
