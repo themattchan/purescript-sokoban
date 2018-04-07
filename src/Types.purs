@@ -4,6 +4,8 @@ import Prelude
 import Matrix (Matrix)
 import Data.Maybe (Maybe)
 import Data.Newtype
+import Data.Record.ShowRecord
+
 import Data.List.NonEmpty
 
 
@@ -17,10 +19,13 @@ type Coord =
 
 newtype Player = Player Coord
 derive instance newtypePlayer :: Newtype Player _
+instance showplayer :: Show Player where show = showRecord <<< unwrap
 
 -- | A box is represented by a coord
 newtype Box = Box Coord
 derive instance newtypeBox :: Newtype Box _
+instance showbox :: Show Box where show = showRecord <<< unwrap
+
 
 type Boxes = NonEmptyList Box
 

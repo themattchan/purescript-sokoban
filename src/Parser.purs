@@ -58,7 +58,6 @@ parseBoard = makeBoard
                       S.toCharArray
                     )
 
-
 newtype MovablePieces = MP {player :: Maybe Player, boxes :: Maybe Boxes}
 derive instance newtypeMovablePieces :: Newtype MovablePieces _
 

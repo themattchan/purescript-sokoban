@@ -15,7 +15,8 @@
     "purescript-matrices": "^3.0.0",
     "purescript-newtype": "^2.0.0",
     "purescript-functors": "^2.2.0",
-    "purescript-orders": "^3.0.0"
+    "purescript-orders": "^3.0.0",
+    "purescript-node-fs": "^4.0.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
