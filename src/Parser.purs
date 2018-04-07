@@ -17,6 +17,7 @@ import Data.Profunctor
 import Data.Tuple
 import Data.Newtype (class Newtype, unwrap)
 import Data.Maybe
+import Data.Maybe.First
 import Data.Monoid
 import Data.Semigroup
 import Data.List.NonEmpty as NE
@@ -51,9 +52,9 @@ parseBoard = -- (flip trace <*> (show <<< map showRecord)) <<<
   where
     makeBoard :: {init :: Array String, rest :: Array String } -> Maybe Level
     makeBoard {init, rest} = do
-        Tuple (MP {player:maybePlayer, boxes: maybeBoxes}) board
+        Tuple (Tuple maybePlayer maybeBoxes) board
            <- doCells init
-        player <- maybePlayer
+        player <- unwrap maybePlayer
         boxes <- maybeBoxes
         pure $ {levelName, player, boxes, board}
       where
@@ -66,25 +67,18 @@ parseBoard = -- (flip trace <*> (show <<< map showRecord)) <<<
                   traverseWithIndex
                     (\i ->
                       map (padR width) <<<
-                      traverseWithIndex (\j -> convert {x:j, y:i}) <<<
+                      traverseWithIndex (\j -> Compose <<< convert {x:j, y:i}) <<<
                       S.toCharArray
                     )
 
-newtype MovablePieces = MP {player :: Maybe Player, boxes :: Maybe Boxes}
-derive instance newtypeMovablePieces :: Newtype MovablePieces _
+type MovablePieces = Tuple (First Player) (Maybe Boxes)
 
-instance monoidMovablePieces :: Monoid MovablePieces where
-  mempty = MP {player:Nothing, boxes:Nothing}
-instance semigroupMovablePieces :: Semigroup MovablePieces where
-  append (MP {player:p1, boxes:b1}) (MP {player:p2, boxes:b2})
-    = MP {player:p1<|>p2, boxes:b1<>b2}
-
-convert :: Coord -> Char -> Compose Maybe (Tuple MovablePieces) Cell
-convert c '#' = Compose $ Just $ Tuple mempty Wall
-convert c '@' = Compose $ Just $ Tuple ((\(MP x) -> MP $ x{player=Just $ Player c}) mempty) Empty -- emit player
-convert c '+' = Compose $ Just $ Tuple ((\(MP x) -> MP $ x{player=Just $ Player c}) mempty) Goal -- emit player
-convert c '$' = Compose $ Just $ Tuple ((\(MP x) -> MP $ x{boxes=Just $ NE.singleton $ Box c}) mempty) Empty -- emit box
-convert c '*' = Compose $ Just $ Tuple ((\(MP x) -> MP $ x{boxes=Just $ NE.singleton $ Box c}) mempty) Goal -- emit box
-convert c '.' = Compose $ Just $ Tuple mempty Goal
-convert c ' ' = Compose $ Just $ Tuple mempty Empty
-convert _ _   = Compose Nothing
+convert :: Coord -> Char -> Maybe (Tuple MovablePieces Cell)
+convert c '#' = Just $ Tuple mempty Wall
+convert c '@' = Just $ Tuple (Tuple (pure (Player c)) mempty) Empty -- emit player
+convert c '+' = Just $ Tuple (Tuple (pure (Player c)) mempty) Goal -- emit player
+convert c '$' = Just $ Tuple (Tuple mempty (pure (NE.singleton (Box c)))) Empty -- emit box
+convert c '*' = Just $ Tuple (Tuple mempty (pure (NE.singleton (Box c)))) Goal -- emit box
+convert c '.' = Just $ Tuple mempty Goal
+convert c ' ' = Just $ Tuple mempty Empty
+convert _ _   = Nothing
