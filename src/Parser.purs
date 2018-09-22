@@ -3,7 +3,9 @@ module Parser where
 import Prelude
 import Data.Bifunctor
 import Data.Tuple
-import Data.List hiding (many)
+--import Data.List hiding (many, length)
+import Data.List as L
+import Data.Array hiding (length)
 
 import Text.Parsing.Parser (Parser)
 import Text.Parsing.Parser.String (char)
@@ -49,24 +51,25 @@ parseCell :: Parser String Cell
 parseCell = choice [ wall, playerNonGoal, playerGoal
                    , boxNonGoal, boxGoal, goal, floor ]
 
-parseRow :: Parser String (List Cell)
+parseRow :: Parser String (L.List Cell)
 parseRow = manyTill parseCell newline
 
 --parseBoard :: Parser String State
 parseBoard = do
-  board <- map transformAnnot parseBoard1
+  board <- parseBoard1
+  let b = L.toArray (map (L.toArray . first) board)
   pure board
   where
-    transformAnnot :: (List (Tuple (List (Tuple Cell Int)) Int))
-                   -> (List (List (Tuple Cell (Tuple Int Int))))
+    transformAnnot :: (L.List (Tuple (L.List (Tuple Cell Int)) Int))
+                   -> (L.List (L.List (Tuple Cell (Tuple Int Int))))
     transformAnnot = map (\(Tuple row ri) ->
                            map (rmap (Tuple ri)) row)
 
-    parseBoard1 :: Parser String (List (Tuple (List (Tuple Cell Int)) Int))
+    parseBoard1 :: Parser String (L.List (Tuple (L.List (Tuple Cell Int)) Int))
     parseBoard1 = parseAnnot (sepBy (parseAnnot parseRow) newline)
 
-    parseAnnot :: forall a b. Parser a (List b) -> Parser a (List (Tuple b Int))
+    parseAnnot :: forall a b. Parser a (L.List b) -> Parser a (L.List (Tuple b Int))
     parseAnnot p = do
       r <- p
-      let n = length r
-      pure $ zip r (range 0 (n-1))
+      let n = L.length r
+      pure $ L.zip r (range 0 (n-1))

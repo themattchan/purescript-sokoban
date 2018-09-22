@@ -1,32 +1,25 @@
 module Types where
 
---import Prelude
+import Prelude
 
+-- board :: grid of booleans, T if wall F o/w
+-- box :: Coord
+-- player :: Coord
+-- goal :: Coord
 
-type Board =
-  { width  :: Int
-  , height :: Int
-  , board  :: Array (Array Cell)
-  }
+type Board = { board  :: Array (Array Boolean) }
 
-type Player =
-  { x :: Int
-  , y :: Int
-  }
+type Coord = { x :: Int , y :: Int }
 
 type State =
   { board :: Board
-  , player :: Player
+  , player :: Coord
+  , box :: Coord
+  , goal :: Coord
   }
 
 data Cell
   = Wall
-  | Box
-  | Player
-  | GoalBox
-  | GoalPlayer
-  | GoalEmpty
-  | Goal Boolean
   | Empty
 --  deriving (Show, Eq)
 
